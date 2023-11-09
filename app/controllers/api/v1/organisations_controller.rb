@@ -23,6 +23,10 @@ class Api::V1::OrganisationsController < Api::V1::AgentAuthBaseController
     authorize @organisation
   end
 
+  def current_organisation
+    @organisation
+  end
+
   def organisation_params
     params.permit(:name, :phone_number, :email, :verticale)
   end

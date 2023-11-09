@@ -64,4 +64,8 @@ class Api::V1::AbsencesController < Api::V1::AgentAuthBaseController
   def update_params
     params.permit(:title, :first_day, :start_time, :end_day, :end_time)
   end
+
+  def current_organisation
+    nil
+  end
 end

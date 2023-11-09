@@ -18,4 +18,8 @@ class Api::V1::ReferentAssignationsController < Api::V1::AgentAuthBaseController
   def referent_assignation_params
     params.permit(:agent_id, :user_id)
   end
+
+  def current_organisation
+    nil
+  end
 end

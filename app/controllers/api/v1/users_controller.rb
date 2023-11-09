@@ -45,6 +45,10 @@ class Api::V1::UsersController < Api::V1::AgentAuthBaseController
     @organisation = params[:organisation_id].present? ? Organisation.find(params[:organisation_id]) : nil
   end
 
+  def current_organisation
+    @organisation
+  end
+
   def set_user
     @user = @organisation.present? ? @organisation.users.find(params[:id]) : User.find(params[:id])
     authorize(@user)

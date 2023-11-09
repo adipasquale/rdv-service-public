@@ -1,6 +1,6 @@
 class Api::V1::WebhookEndpointsController < Api::V1::AgentAuthBaseController
   before_action :set_webhook_endpoint, only: %i[update]
-  before_action :set_organisation, only: %i[index create update]
+  before_action :set_organisation
 
   def index
     webhook_endpoints = policy_scope(WebhookEndpoint).where(organisation_id: params[:organisation_id])
@@ -35,6 +35,10 @@ class Api::V1::WebhookEndpointsController < Api::V1::AgentAuthBaseController
 
   def set_organisation
     @organisation = Organisation.find(params[:organisation_id])
+  end
+
+  def current_organisation
+    @organisation
   end
 
   def permitted_params

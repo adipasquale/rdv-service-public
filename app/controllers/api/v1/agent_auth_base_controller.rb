@@ -10,12 +10,7 @@ class Api::V1::AgentAuthBaseController < Api::V1::BaseController
   end
 
   def current_organisation
-    @current_organisation ||=
-      if params[:organisation_id].blank?
-        nil
-      else
-        current_agent.organisations.find_by(id: params[:organisation_id])
-      end
+    @current_organisation ||= current_agent.organisations.find(params[:organisation_id])
   end
 
   def policy_scope(clasz)
