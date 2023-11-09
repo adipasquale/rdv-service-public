@@ -56,12 +56,12 @@ describe "RDV authentified API", swagger_doc: "v1/api.json" do
         end
       end
 
-      response 200, "returns empty results when organisation is not found", document: false do
-        let(:organisation_id) { "false" }
+      response 404, "returns a 404 when organisation is not found", document: false do
+        let(:organisation_id) { "123456" }
 
         run_test!
 
-        it { expect(response.parsed_body["rdvs"]).to eq([]) }
+        it { expect(response.parsed_body["errors"]).to eq(["Couldn't find Organisation with 'id'=123456"]) }
       end
 
       context "with starts_after and starts_before params" do

@@ -5,4 +5,10 @@ class Api::V1::RdvsController < Api::V1::AgentAuthBaseController
     rdvs = rdvs.starts_before(Time.zone.parse(params[:starts_before])) if params[:starts_before].present?
     render_collection(rdvs)
   end
+
+  private
+
+  def current_organisation
+    Organisation.find(params[:organisation_id])
+  end
 end
