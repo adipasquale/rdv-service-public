@@ -11,11 +11,12 @@ class WebhookJob < ApplicationJob
 
   def perform(payload, webhook_endpoint_id)
     webhook_endpoint = WebhookEndpoint.find(webhook_endpoint_id)
+    @target_url = webhook_endpoint.target_url
 
-    return if Rails.env.development? && webhook_endpoint.target_url !~ /localhost/
+    return if Rails.env.development? && @target_url !~ /localhost/
 
     request = Typhoeus::Request.new(
-      webhook_endpoint.target_url,
+      @target_url,
       method: :post,
       headers: {
         "Content-Type" => "application/json; charset=utf-8",
@@ -26,15 +27,12 @@ class WebhookJob < ApplicationJob
     )
 
     request.on_failure do |response|
-      Sentry.with_scope do |scope|
-        # Cela permet d'avoir une issue Sentry séparée pour chaque URL et statut HTTP
-        scope.set_fingerprint(["OutgoingWebhookError", webhook_endpoint.target_url, response.code.to_s])
+      @response_code = response.code.to_s
 
-        if response.timed_out?
-          raise OutgoingWebhookError, "HTTP Timeout, URL: #{webhook_endpoint.target_url}"
-        elsif !WebhookJob.false_negative_from_drome?(response.body)
-          raise OutgoingWebhookError, "HTTP #{response.code}, URL: #{webhook_endpoint.target_url}"
-        end
+      if response.timed_out?
+        raise OutgoingWebhookError, "HTTP Timeout, URL: #{@target_url}"
+      elsif !WebhookJob.false_negative_from_drome?(response.body)
+        raise OutgoingWebhookError, "HTTP #{response.code}, URL: #{@target_url}"
       end
     end
 
@@ -47,6 +45,11 @@ class WebhookJob < ApplicationJob
     # - un premier avertissement assez rapide s'il y a un problème (4e essai)
     # - une notification pour le dernier essai, avant que le job passe en "abandonnés"
     executions == 4 || executions >= 10 || executions == MAX_ATTEMPTS
+  end
+
+  # Cela permet d'identifier singulièrement l'erreur selon l'URL et le code HTTP de la réponse
+  def sentry_fingerprint
+    ["OutgoingWebhookError", @target_url, @response_code]
   end
 
   # La réponse de la Drôme est en JSON
