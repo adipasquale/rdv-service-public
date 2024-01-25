@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_01_22_082202) do
+ActiveRecord::Schema[7.0].define(version: 2024_01_25_102621) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
   enable_extension "pgcrypto"
@@ -354,7 +354,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_01_22_082202) do
     t.index ["short_name"], name: "index_motif_categories_on_short_name", unique: true
   end
 
-  create_table "motif_categories_territories", id: false, force: :cascade do |t|
+  create_table "motif_categories_territories", primary_key: ["motif_category_id", "territory_id"], force: :cascade do |t|
     t.bigint "motif_category_id", null: false
     t.bigint "territory_id", null: false
     t.index ["motif_category_id", "territory_id"], name: "index_motif_cat_territories_on_motif_cat_id_and_territory_id", unique: true
@@ -396,11 +396,10 @@ ActiveRecord::Schema[7.0].define(version: 2024_01_22_082202) do
     t.index ["visibility_type"], name: "index_motifs_on_visibility_type"
   end
 
-  create_table "motifs_plage_ouvertures", id: false, force: :cascade do |t|
+  create_table "motifs_plage_ouvertures", primary_key: ["motif_id", "plage_ouverture_id"], force: :cascade do |t|
     t.bigint "motif_id", null: false
     t.bigint "plage_ouverture_id", null: false
-    t.index ["motif_id"], name: "index_motifs_plage_ouvertures_on_motif_id"
-    t.index ["plage_ouverture_id"], name: "index_motifs_plage_ouvertures_on_plage_ouverture_id"
+    t.index ["motif_id", "plage_ouverture_id"], name: "index_motifs_plage_ouvertures_primary_keys", unique: true
   end
 
   create_table "organisations", force: :cascade do |t|
